@@ -36,7 +36,7 @@ class Validity:
         self.n_samples = len(data)
         self.n_items = len(data.columns)
 
-    def efa(self, n_factors=None, rotation='varimax', method='minres'):
+    def efa(self, n_factors=None, rotation="varimax", method="minres"):
         """
         探索性因子分析 (Exploratory Factor Analysis)
 
@@ -98,15 +98,15 @@ class Validity:
         loadings_df = pd.DataFrame(
             loadings,
             index=self.data.columns,
-            columns=[f'Factor{i+1}' for i in range(n_factors)]
+            columns=[f"Factor{i + 1}" for i in range(n_factors)],
         )
 
         # 计算方差解释
         variance = fa.get_factor_variance()
         variance_df = pd.DataFrame(
             variance,
-            index=['SS Loadings', 'Proportion Var', 'Cumulative Var'],
-            columns=[f'Factor{i+1}' for i in range(n_factors)]
+            index=["SS Loadings", "Proportion Var", "Cumulative Var"],
+            columns=[f"Factor{i + 1}" for i in range(n_factors)],
         )
 
         # 推荐因子结构（每个题目归入载荷最大的因子）
@@ -114,28 +114,27 @@ class Validity:
 
         # 获取共同度
         communalities = fa.get_communalities()
-        communalities_df = pd.DataFrame({
-            'item': self.data.columns,
-            'communality': communalities
-        })
+        communalities_df = pd.DataFrame(
+            {"item": self.data.columns, "communality": communalities}
+        )
 
         return {
-            'n_factors': n_factors,
-            'loadings': loadings_df,
-            'variance': variance_df,
-            'communalities': communalities_df,
-            'kmo': {
-                'overall': kmo_model,
-                'per_item': pd.DataFrame({'item': self.data.columns, 'kmo': kmo_all})
+            "n_factors": n_factors,
+            "loadings": loadings_df,
+            "variance": variance_df,
+            "communalities": communalities_df,
+            "kmo": {
+                "overall": kmo_model,
+                "per_item": pd.DataFrame({"item": self.data.columns, "kmo": kmo_all}),
             },
-            'bartlett': {
-                'chi_square': chi_square,
-                'p_value': p_value,
-                'df': (self.n_items * (self.n_items - 1)) // 2
+            "bartlett": {
+                "chi_square": chi_square,
+                "p_value": p_value,
+                "df": (self.n_items * (self.n_items - 1)) // 2,
             },
-            'factor_structure': factor_structure,
-            'rotation': rotation,
-            'method': method
+            "factor_structure": factor_structure,
+            "rotation": rotation,
+            "method": method,
         }
 
     def _extract_factor_structure(self, loadings_df, threshold=0.4):
@@ -197,23 +196,23 @@ class Validity:
 
         # 获取标准化载荷
         estimates = model.inspect()
-        loadings = estimates[estimates['op'] == '~']
+        loadings = estimates[estimates["op"] == "~"]
 
         return {
-            'fit_indices': fit_indices,
-            'loadings': loadings,
-            'estimates': estimates,
-            'model': model,
-            'model_spec': model_str
+            "fit_indices": fit_indices,
+            "loadings": loadings,
+            "estimates": estimates,
+            "model": model,
+            "model_spec": model_str,
         }
 
     def _dict_to_lavaan(self, factor_dict):
         """将因子结构字典转换为lavaan语法"""
         lines = []
         for factor, items in factor_dict.items():
-            items_str = ' + '.join(items)
+            items_str = " + ".join(items)
             lines.append(f"{factor} =~ {items_str}")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _extract_fit_indices(self, model):
         """提取拟合指数"""
@@ -263,34 +262,36 @@ class Validity:
             sum_error_var = np.sum(1 - loadings**2)
             cr = (sum_loadings**2) / (sum_loadings**2 + sum_error_var)
 
-            results.append({
-                'factor': factor,
-                'n_items': len(items),
-                'ave': ave,
-                'cr': cr,
-                'ave_quality': self._classify_ave(ave),
-                'cr_quality': self._classify_cr(cr)
-            })
+            results.append(
+                {
+                    "factor": factor,
+                    "n_items": len(items),
+                    "ave": ave,
+                    "cr": cr,
+                    "ave_quality": self._classify_ave(ave),
+                    "cr_quality": self._classify_cr(cr),
+                }
+            )
 
         return pd.DataFrame(results)
 
     def _classify_ave(self, ave):
         """AVE质量分类"""
         if ave >= 0.5:
-            return '良好'
+            return "良好"
         elif ave >= 0.36:
-            return '可接受'
+            return "可接受"
         else:
-            return '较差'
+            return "较差"
 
     def _classify_cr(self, cr):
         """CR质量分类"""
         if cr >= 0.7:
-            return '良好'
+            return "良好"
         elif cr >= 0.6:
-            return '可接受'
+            return "可接受"
         else:
-            return '较差'
+            return "较差"
 
     def discriminant_validity(self, factor_structure):
         """
@@ -347,20 +348,24 @@ class Validity:
                 max_corr = np.nan
                 passed = True
 
-            fornell_larcker_results.append({
-                'factor': factor,
-                'ave_sqrt': sqrt_ave,
-                'max_correlation': max_corr,
-                'passed': passed
-            })
+            fornell_larcker_results.append(
+                {
+                    "factor": factor,
+                    "ave_sqrt": sqrt_ave,
+                    "max_correlation": max_corr,
+                    "passed": passed,
+                }
+            )
 
         return {
-            'correlation_matrix': corr_matrix,
-            'ave_sqrt': ave_sqrt,
-            'fornell_larcker': pd.DataFrame(fornell_larcker_results)
+            "correlation_matrix": corr_matrix,
+            "ave_sqrt": ave_sqrt,
+            "fornell_larcker": pd.DataFrame(fornell_larcker_results),
         }
 
-    def analyze(self, n_factors=None, rotation='varimax', factor_structure=None, cfa_model=None):
+    def analyze(
+        self, n_factors=None, rotation="varimax", factor_structure=None, cfa_model=None
+    ):
         """
         完整的效度分析报告
 
@@ -385,32 +390,32 @@ class Validity:
         # EFA分析
         try:
             efa_results = self.efa(n_factors=n_factors, rotation=rotation)
-            results['efa'] = efa_results
+            results["efa"] = efa_results
 
             # 如果未指定因子结构，使用EFA推荐的结构
             if factor_structure is None:
-                factor_structure = efa_results['factor_structure']
+                factor_structure = efa_results["factor_structure"]
         except Exception as e:
-            results['efa'] = {'error': str(e)}
+            results["efa"] = {"error": str(e)}
 
         # AVE和CR分析
         if factor_structure:
             try:
                 ave_cr_results = self.ave_cr(factor_structure)
-                results['ave_cr'] = ave_cr_results
+                results["ave_cr"] = ave_cr_results
 
                 # 判别效度
                 discriminant_results = self.discriminant_validity(factor_structure)
-                results['discriminant_validity'] = discriminant_results
+                results["discriminant_validity"] = discriminant_results
             except Exception as e:
-                results['ave_cr'] = {'error': str(e)}
+                results["ave_cr"] = {"error": str(e)}
 
         # CFA分析
         if cfa_model:
             try:
                 cfa_results = self.cfa(cfa_model)
-                results['cfa'] = cfa_results
+                results["cfa"] = cfa_results
             except Exception as e:
-                results['cfa'] = {'error': str(e)}
+                results["cfa"] = {"error": str(e)}
 
         return results

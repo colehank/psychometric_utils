@@ -8,11 +8,7 @@ Psychometric Analysis Library
 from .item_analysis import ItemAnalysis
 from .reliability import Reliability
 from .validity import Validity
-from .exceptions import (
-    PsychometricError,
-    DataValidationError,
-    InsufficientDataError
-)
+from .exceptions import PsychometricError, DataValidationError, InsufficientDataError
 
 __version__ = "0.1.0"
 __all__ = [

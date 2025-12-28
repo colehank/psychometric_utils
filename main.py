@@ -30,7 +30,7 @@ def quick_start_demo():
         error = np.random.randn(n_samples) * 0.4
         score = factor1 * loading + error
         score = (score - score.min()) / (score.max() - score.min()) * 4 + 1
-        data[f'Q{i}'] = np.round(score).clip(1, 5)
+        data[f"Q{i}"] = np.round(score).clip(1, 5)
 
     # Factor 2的题目
     for i in range(6, 11):
@@ -38,19 +38,19 @@ def quick_start_demo():
         error = np.random.randn(n_samples) * 0.4
         score = factor2 * loading + error
         score = (score - score.min()) / (score.max() - score.min()) * 4 + 1
-        data[f'Q{i}'] = np.round(score).clip(1, 5)
+        data[f"Q{i}"] = np.round(score).clip(1, 5)
 
     print(f"   生成了{len(data)}个样本，{len(data.columns)}个题目")
-    print(f"\n数据预览：")
+    print("\n数据预览：")
     print(data.head())
 
     # 项目分析
     print("\n2. 项目分析...")
     ia = ItemAnalysis(data)
     item_result = ia.analyze()
-    print(f"   难易度分析：✓")
-    print(f"   CITC分析：✓")
-    print(f"   极端组检验：✓")
+    print("   难易度分析：✓")
+    print("   CITC分析：✓")
+    print("   极端组检验：✓")
 
     # 信度分析
     print("\n3. 信度分析...")
@@ -62,15 +62,15 @@ def quick_start_demo():
     print("\n4. 效度分析...")
     val = Validity(data)
     try:
-        efa_result = val.efa(n_factors=2, rotation='varimax')
+        efa_result = val.efa(n_factors=2, rotation="varimax")
         print(f"   KMO = {efa_result['kmo']['overall']:.4f}")
         print(f"   提取{efa_result['n_factors']}个因子")
         print(f"   累积方差解释 = {efa_result['variance'].iloc[2, -1]:.2%}")
 
         # AVE和CR
-        factor_structure = efa_result['factor_structure']
+        factor_structure = efa_result["factor_structure"]
         ave_cr = val.ave_cr(factor_structure)
-        print(f"\n   AVE和CR结果：")
+        print("\n   AVE和CR结果：")
         for _, row in ave_cr.iterrows():
             print(f"   {row['factor']}: AVE={row['ave']:.3f}, CR={row['cr']:.3f}")
 

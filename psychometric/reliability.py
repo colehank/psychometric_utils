@@ -59,10 +59,10 @@ class Reliability:
         alpha_value = alpha_result[0]
 
         result = {
-            'alpha': alpha_value,
-            'n_items': self.n_items,
-            'n_samples': self.n_samples,
-            'quality': self._classify_reliability(alpha_value)
+            "alpha": alpha_value,
+            "n_items": self.n_items,
+            "n_samples": self.n_samples,
+            "quality": self._classify_reliability(alpha_value),
         }
 
         if standardized:
@@ -70,7 +70,7 @@ class Reliability:
             # 标准化数据
             standardized_data = (self.data - self.data.mean()) / self.data.std()
             std_alpha = pg.cronbach_alpha(data=standardized_data)[0]
-            result['standardized_alpha'] = std_alpha
+            result["standardized_alpha"] = std_alpha
 
         return result
 
@@ -108,21 +108,23 @@ class Reliability:
 
             # 给出建议
             if alpha_change > 0.05:
-                recommendation = '建议删除（删除后α显著提升）'
+                recommendation = "建议删除（删除后α显著提升）"
             elif alpha_change > 0:
-                recommendation = '考虑删除（删除后α略有提升）'
+                recommendation = "考虑删除（删除后α略有提升）"
             else:
-                recommendation = '保留'
+                recommendation = "保留"
 
-            results.append({
-                'item': col,
-                'alpha_if_deleted': alpha_new,
-                'alpha_change': alpha_change,
-                'recommendation': recommendation
-            })
+            results.append(
+                {
+                    "item": col,
+                    "alpha_if_deleted": alpha_new,
+                    "alpha_change": alpha_change,
+                    "recommendation": recommendation,
+                }
+            )
 
         df_result = pd.DataFrame(results)
-        df_result['original_alpha'] = original_alpha
+        df_result["original_alpha"] = original_alpha
 
         return df_result
 
@@ -176,9 +178,9 @@ class Reliability:
             omega = (sum_loadings**2) / (sum_loadings**2 + sum_error_var)
 
             return {
-                'omega_total': omega,
-                'n_factors': 1,
-                'quality': self._classify_reliability(omega)
+                "omega_total": omega,
+                "n_factors": 1,
+                "quality": self._classify_reliability(omega),
             }
         except Exception as e:
             raise DataValidationError(f"Omega计算失败: {str(e)}")
@@ -215,33 +217,31 @@ class Reliability:
                 omega = (sum_loadings**2) / (sum_loadings**2 + sum_error_var)
 
                 results[factor_name] = {
-                    'omega': omega,
-                    'n_items': len(items),
-                    'quality': self._classify_reliability(omega)
+                    "omega": omega,
+                    "n_items": len(items),
+                    "quality": self._classify_reliability(omega),
                 }
             except Exception as e:
-                results[factor_name] = {
-                    'error': str(e)
-                }
+                results[factor_name] = {"error": str(e)}
 
         return results
 
     def _classify_reliability(self, value):
         """信度质量分类"""
         if pd.isna(value):
-            return '无法计算'
+            return "无法计算"
         elif value >= 0.9:
-            return '优秀'
+            return "优秀"
         elif value >= 0.8:
-            return '良好'
+            return "良好"
         elif value >= 0.7:
-            return '可接受'
+            return "可接受"
         elif value >= 0.6:
-            return '较差'
+            return "较差"
         else:
-            return '不可接受'
+            return "不可接受"
 
-    def split_half_reliability(self, method='even-odd'):
+    def split_half_reliability(self, method="even-odd"):
         """
         分半信度
 
@@ -261,11 +261,11 @@ class Reliability:
         """
         n_items = self.n_items
 
-        if method == 'even-odd':
+        if method == "even-odd":
             # 奇偶分半
             half1_cols = self.data.columns[::2]
             half2_cols = self.data.columns[1::2]
-        elif method == 'first-second':
+        elif method == "first-second":
             # 前后分半
             mid = n_items // 2
             half1_cols = self.data.columns[:mid]
@@ -277,8 +277,12 @@ class Reliability:
         half2_data = self.data[half2_cols]
 
         # 计算两半的α系数
-        half1_alpha = pg.cronbach_alpha(data=half1_data)[0] if len(half1_cols) >= 2 else np.nan
-        half2_alpha = pg.cronbach_alpha(data=half2_data)[0] if len(half2_cols) >= 2 else np.nan
+        half1_alpha = (
+            pg.cronbach_alpha(data=half1_data)[0] if len(half1_cols) >= 2 else np.nan
+        )
+        half2_alpha = (
+            pg.cronbach_alpha(data=half2_data)[0] if len(half2_cols) >= 2 else np.nan
+        )
 
         # 计算两半总分的相关
         half1_score = half1_data.sum(axis=1)
@@ -289,12 +293,12 @@ class Reliability:
         spearman_brown = (2 * correlation) / (1 + correlation)
 
         return {
-            'method': method,
-            'half1_alpha': half1_alpha,
-            'half2_alpha': half2_alpha,
-            'correlation': correlation,
-            'spearman_brown': spearman_brown,
-            'quality': self._classify_reliability(spearman_brown)
+            "method": method,
+            "half1_alpha": half1_alpha,
+            "half2_alpha": half2_alpha,
+            "correlation": correlation,
+            "spearman_brown": spearman_brown,
+            "quality": self._classify_reliability(spearman_brown),
         }
 
     def analyze(self, factor_structure=None):
@@ -316,15 +320,15 @@ class Reliability:
             - split_half: 分半信度结果
         """
         results = {
-            'cronbach_alpha': self.cronbach_alpha(standardized=True),
-            'alpha_if_deleted': self.alpha_if_deleted(),
-            'split_half': self.split_half_reliability()
+            "cronbach_alpha": self.cronbach_alpha(standardized=True),
+            "alpha_if_deleted": self.alpha_if_deleted(),
+            "split_half": self.split_half_reliability(),
         }
 
         # 计算Omega
         try:
-            results['omega'] = self.omega(factor_structure)
+            results["omega"] = self.omega(factor_structure)
         except Exception as e:
-            results['omega'] = {'error': str(e)}
+            results["omega"] = {"error": str(e)}
 
         return results

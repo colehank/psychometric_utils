@@ -52,7 +52,7 @@ def validate_dataframe(data, min_samples=30, min_items=1):
     return True
 
 
-def handle_missing_values(data, method='drop'):
+def handle_missing_values(data, method="drop"):
     """
     处理缺失值
 
@@ -68,9 +68,9 @@ def handle_missing_values(data, method='drop'):
     pd.DataFrame
         处理后的数据
     """
-    if method == 'drop':
+    if method == "drop":
         return data.dropna()
-    elif method == 'mean':
+    elif method == "mean":
         return data.fillna(data.mean())
     else:
         raise ValueError(f"不支持的缺失值处理方法: {method}")
@@ -111,12 +111,10 @@ def is_binary(data):
     unique_vals = unique_vals[~np.isnan(unique_vals)]
     return len(unique_vals) == 2 and set(unique_vals).issubset({0, 1})
 
+
 def generate_data(
-        n_samples=200, 
-        n_items=10, 
-        n_factors=2, 
-        random_seed=42
-        )-> pd.DataFrame:
+    n_samples=200, n_items=10, n_factors=2, random_seed=42
+) -> pd.DataFrame:
     """
     生成模拟问卷数据
 
@@ -162,7 +160,7 @@ def generate_data(
     data = np.clip(data, 1, 5)
 
     # 创建DataFrame
-    columns = [f'Q{i+1}' for i in range(n_items)]
+    columns = [f"Q{i + 1}" for i in range(n_items)]
     df = pd.DataFrame(data, columns=columns)
 
     return df

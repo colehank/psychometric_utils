@@ -5,7 +5,6 @@
 """
 
 import pandas as pd
-import numpy as np
 from scipy import stats
 from .utils import validate_dataframe, is_binary
 from .exceptions import DataValidationError
@@ -76,35 +75,37 @@ class ItemAnalysis:
                     difficulty = 0.5
                 level = self._classify_difficulty_continuous(difficulty)
 
-            results.append({
-                'item': col,
-                'mean': mean_val,
-                'std': std_val,
-                'min': min_val,
-                'max': max_val,
-                'difficulty': difficulty,
-                'level': level
-            })
+            results.append(
+                {
+                    "item": col,
+                    "mean": mean_val,
+                    "std": std_val,
+                    "min": min_val,
+                    "max": max_val,
+                    "difficulty": difficulty,
+                    "level": level,
+                }
+            )
 
         return pd.DataFrame(results)
 
     def _classify_difficulty_binary(self, p):
         """二分数据难易度分类"""
         if p >= 0.7:
-            return '易'
+            return "易"
         elif p >= 0.3:
-            return '中'
+            return "中"
         else:
-            return '难'
+            return "难"
 
     def _classify_difficulty_continuous(self, d):
         """连续数据难易度分类"""
         if d >= 0.7:
-            return '易'
+            return "易"
         elif d >= 0.3:
-            return '中'
+            return "中"
         else:
-            return '难'
+            return "难"
 
     def citc(self, corrected=True):
         """
@@ -143,28 +144,24 @@ class ItemAnalysis:
 
             quality = self._classify_citc(correlation)
 
-            results.append({
-                'item': col,
-                'citc': correlation,
-                'quality': quality
-            })
+            results.append({"item": col, "citc": correlation, "quality": quality})
 
         return pd.DataFrame(results)
 
     def _classify_citc(self, r):
         """CITC质量分类"""
         if pd.isna(r):
-            return '无法计算'
+            return "无法计算"
         elif r >= 0.4:
-            return '优秀'
+            return "优秀"
         elif r >= 0.3:
-            return '良好'
+            return "良好"
         elif r >= 0.2:
-            return '可接受'
+            return "可接受"
         else:
-            return '较差'
+            return "较差"
 
-    def extreme_group_test(self, p=0.27, method='independent'):
+    def extreme_group_test(self, p=0.27, method="independent"):
         """
         极端组检验 (Extreme Group Method)
 
@@ -199,7 +196,9 @@ class ItemAnalysis:
         # 确定分组阈值
         n_extreme = int(len(total_score) * p)
         if n_extreme < 10:
-            raise DataValidationError(f"极端组样本量过小（{n_extreme}），建议增加样本或调整p值")
+            raise DataValidationError(
+                f"极端组样本量过小（{n_extreme}），建议增加样本或调整p值"
+            )
 
         # 排序并分组
         sorted_indices = total_score.argsort()
@@ -217,39 +216,43 @@ class ItemAnalysis:
             difference = high_mean - low_mean
 
             # 执行检验
-            if method == 'independent':
+            if method == "independent":
                 statistic, p_value = stats.ttest_ind(high_group, low_group)
-            elif method == 'mann-whitney':
-                statistic, p_value = stats.mannwhitneyu(high_group, low_group, alternative='two-sided')
+            elif method == "mann-whitney":
+                statistic, p_value = stats.mannwhitneyu(
+                    high_group, low_group, alternative="two-sided"
+                )
             else:
                 raise ValueError(f"不支持的检验方法: {method}")
 
             significant = p_value < 0.05
             discrimination = self._classify_discrimination(difference, significant)
 
-            results.append({
-                'item': col,
-                'high_mean': high_mean,
-                'low_mean': low_mean,
-                'difference': difference,
-                'statistic': statistic,
-                'p_value': p_value,
-                'significant': significant,
-                'discrimination': discrimination
-            })
+            results.append(
+                {
+                    "item": col,
+                    "high_mean": high_mean,
+                    "low_mean": low_mean,
+                    "difference": difference,
+                    "statistic": statistic,
+                    "p_value": p_value,
+                    "significant": significant,
+                    "discrimination": discrimination,
+                }
+            )
 
         return pd.DataFrame(results)
 
     def _classify_discrimination(self, diff, significant):
         """区分度分类"""
         if not significant:
-            return '不显著'
+            return "不显著"
         elif diff >= 0.3:
-            return '优秀'
+            return "优秀"
         elif diff >= 0.2:
-            return '良好'
+            return "良好"
         else:
-            return '一般'
+            return "一般"
 
     def analyze(self, extreme_p=0.27):
         """
@@ -274,20 +277,23 @@ class ItemAnalysis:
         extreme_df = self.extreme_group_test(p=extreme_p)
 
         # 合并结果
-        summary = difficulty_df[['item', 'difficulty', 'level']].merge(
-            citc_df[['item', 'citc', 'quality']], on='item'
-        ).merge(
-            extreme_df[['item', 'difference', 'significant', 'discrimination']], on='item'
+        summary = (
+            difficulty_df[["item", "difficulty", "level"]]
+            .merge(citc_df[["item", "citc", "quality"]], on="item")
+            .merge(
+                extreme_df[["item", "difference", "significant", "discrimination"]],
+                on="item",
+            )
         )
 
         # 添加综合建议
-        summary['recommendation'] = summary.apply(self._get_recommendation, axis=1)
+        summary["recommendation"] = summary.apply(self._get_recommendation, axis=1)
 
         return {
-            'difficulty': difficulty_df,
-            'citc': citc_df,
-            'extreme_group': extreme_df,
-            'summary': summary
+            "difficulty": difficulty_df,
+            "citc": citc_df,
+            "extreme_group": extreme_df,
+            "summary": summary,
         }
 
     def _get_recommendation(self, row):
@@ -295,20 +301,20 @@ class ItemAnalysis:
         issues = []
 
         # 检查难易度
-        if row['level'] in ['易', '难']:
+        if row["level"] in ["易", "难"]:
             issues.append(f"难易度偏{row['level']}")
 
         # 检查CITC
-        if row['quality'] in ['较差', '可接受']:
+        if row["quality"] in ["较差", "可接受"]:
             issues.append(f"CITC{row['quality']}")
 
         # 检查区分度
-        if row['discrimination'] in ['不显著', '一般']:
+        if row["discrimination"] in ["不显著", "一般"]:
             issues.append(f"区分度{row['discrimination']}")
 
         if not issues:
-            return '保留'
+            return "保留"
         elif len(issues) >= 2:
-            return '建议删除'
+            return "建议删除"
         else:
-            return '考虑修改'
+            return "考虑修改"
