@@ -1,0 +1,16 @@
+[project]
+name = "psychometric"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "factor-analyzer>=0.5.1",
+    "numpy>=2.4.0",
+    "pandas>=2.3.3",
+    "pingouin>=0.5.5",
+    "semopy>=2.3.11",
+    "scikit-learn<1.6",
+    "scipy>=1.14.0",
+    "graphviz>=0.21",
+]
