@@ -1,4 +1,6 @@
-# Psychometric - 心理测量学问卷指标计算库
+# Psychometric_utils
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://colehank.github.io/psychometric_utils/)
 
 一个简单心理测量学库，包括项目分析、信度分析和效度分析。
 
@@ -27,3 +29,6 @@
 ```bash
 uv add psychometric
 ```
+
+## 使用示例
+[示例](https://colehank.github.io/psychometric_utils/)
