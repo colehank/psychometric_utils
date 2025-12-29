@@ -1,6 +1,8 @@
 # Psychometric_utils
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://colehank.github.io/psychometric_utils/)
+![PyPI](https://img.shields.io/pypi/v/psychometric)
+
 
 一个简单心理测量学库，包括项目分析、信度分析和效度分析。
 
