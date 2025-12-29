@@ -23,11 +23,8 @@
   - 判别效度分析
 
 ## 安装
-
-使用uv安装：
-
 ```bash
-uv add psychometric
+pip install psychometric
 ```
 
 ## 使用示例
